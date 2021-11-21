@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 class NoteDetails extends StatefulWidget {
   final String appBarTitle;
   final Note note;
+
   const NoteDetails(this.note, this.appBarTitle, {Key? key}) : super(key: key);
 
   @override
@@ -18,19 +19,18 @@ class _NoteDetailsState extends State<NoteDetails> {
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
+
   bool shouldPop = true;
 
   @override
   Widget build(BuildContext context) {
-    // TextStyle textStyle = Theme.of(context).textTheme.title;
+    TextStyle? textStyle = Theme.of(context).textTheme.bodyText1;
 
-    titleController.text = widget.note.title!;
-    descriptionController.text = widget.note.description!;
+    titleController.text = widget.note.title;
+    descriptionController.text = widget.note.description;
 
     return WillPopScope(
-      onWillPop: () async {
-        return shouldPop;
-      },
+      onWillPop: () => moveToLastScreen(),
       child: Scaffold(
         backgroundColor: Colors.white70,
         appBar: AppBar(
@@ -56,22 +56,26 @@ class _NoteDetailsState extends State<NoteDetails> {
                   child: ListTile(
                     leading: const Icon(Icons.low_priority),
                     title: DropdownButton(
-                        items: _priorities.map((String dropDownStringItem) {
-                          return DropdownMenuItem<String>(
-                            value: dropDownStringItem,
-                            child: Text(dropDownStringItem,
-                                style: const TextStyle(
-                                    fontSize: 20.0,
-                                    fontWeight: FontWeight.w500,
-                                    color: Colors.lightGreen)),
-                          );
-                        }).toList(),
-                        value: getPriorityAsString(widget.note.priority!),
-                        onChanged: (valueSelectedByUser) {
-                          setState(() {
-                            updatePriorityAsInt(valueSelectedByUser);
-                          });
-                        }),
+                      items: _priorities.map((String dropDownStringItem) {
+                        return DropdownMenuItem<String>(
+                          value: dropDownStringItem,
+                          child: Text(
+                            dropDownStringItem,
+                            style: const TextStyle(
+                              fontSize: 20.0,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.lightGreen,
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                      value: getPriorityAsString(widget.note.priority),
+                      onChanged: (valueSelectedByUser) {
+                        setState(() {
+                          updatePriorityAsInt(valueSelectedByUser.toString());
+                        });
+                      },
+                    ),
                   ),
                 ),
                 // Second Element
@@ -182,14 +186,12 @@ class _NoteDetailsState extends State<NoteDetails> {
   void _save() async {
     moveToLastScreen();
     widget.note.date = DateFormat.yMMMd().format(DateTime.now());
-
     int result;
     if (widget.note.id != null) {
       result = await helper.updateNote(widget.note);
     } else {
-      result = helper.insertNote(widget.note) as int;
+      result = await helper.insertNote(widget.note);
     }
-
     if (result != 0) {
       _showAlertDialog('Status', 'Note Saved Succesfully');
     } else {
@@ -199,13 +201,13 @@ class _NoteDetailsState extends State<NoteDetails> {
 
   void _delete() async {
     moveToLastScreen();
-
     if (widget.note.id == null) {
       _showAlertDialog('Status', 'First Add a note');
       return;
     }
 
     int result = await helper.deleteNote(widget.note.id);
+
     if (result == 0) {
       _showAlertDialog('Status', 'Problem in Deleting Note');
     } else {
@@ -214,7 +216,7 @@ class _NoteDetailsState extends State<NoteDetails> {
   }
 
   //conver to int to save into database
-  void updatePriorityAsInt(dynamic value) {
+  void updatePriorityAsInt(String value) {
     switch (value) {
       case 'High':
         widget.note.priority = 1;
@@ -226,8 +228,8 @@ class _NoteDetailsState extends State<NoteDetails> {
   }
 
   //convert int to String to show user
-  String getPriorityAsString(int value) {
-    late String priority;
+  String? getPriorityAsString(int value) {
+    String? priority;
     switch (value) {
       case 1:
         priority = _priorities[0];
@@ -239,8 +241,8 @@ class _NoteDetailsState extends State<NoteDetails> {
     return priority;
   }
 
-  void moveToLastScreen() {
-    Navigator.pop(context, true);
+  moveToLastScreen() async {
+    return Navigator.pop(context, true);
   }
 
   void _showAlertDialog(String title, String message) {
