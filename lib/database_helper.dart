@@ -5,6 +5,9 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 class DatabaseHelper {
+  static final DatabaseHelper databaseHelper = DatabaseHelper._createInstance();
+  static Database? _database;
+
   String noteTable = 'note_table';
   String colID = 'id';
   String colTitle = 'title';
@@ -13,9 +16,7 @@ class DatabaseHelper {
   String colDate = 'date';
 
   DatabaseHelper._createInstance();
-  static final DatabaseHelper databaseHelper = DatabaseHelper._createInstance();
 
-  static Database? _database;
   Future<Database?> get database async {
     if (_database != null) {
       return _database;
@@ -34,7 +35,7 @@ class DatabaseHelper {
 
   void _createDb(Database db, int newVersion) async {
     db.execute(
-        'CREATE TABLE $noteTable($colID INTERGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $colDescription TEXT, $colPriority INTEGER, $colDate TEXT)');
+        'CREATE TABLE $noteTable($colID INTEGER PRIMARY KEY AUTOINCREMENT, $colTitle TEXT, $colDescription TEXT, $colPriority INTEGER, $colDate TEXT)');
   }
 
   Future<List<Map<String, dynamic>>> getNoteMapList() async {

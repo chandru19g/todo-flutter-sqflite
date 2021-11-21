@@ -14,12 +14,14 @@ class NoteList extends StatefulWidget {
 
 class _NoteListState extends State<NoteList> {
   DatabaseHelper databaseHelper = DatabaseHelper.databaseHelper;
-
-  late List<Note> noteList;
+  List<Note> noteList = [];
   int count = 0;
 
   @override
   Widget build(BuildContext context) {
+    if (noteList.isEmpty) {
+      updateListView();
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text("Todo App"),
@@ -48,11 +50,12 @@ class _NoteListState extends State<NoteList> {
           elevation: 4.0,
           child: ListTile(
             leading: const CircleAvatar(
-              backgroundImage:
-                  NetworkImage("https://learncodeonline.in/mascot.png"),
+              backgroundImage: NetworkImage(
+                "https://learncodeonline.in/mascot.png",
+              ),
             ),
             title: Text(
-              noteList[position].title!,
+              noteList[position].title,
               style: const TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -60,7 +63,7 @@ class _NoteListState extends State<NoteList> {
               ),
             ),
             subtitle: Text(
-              noteList[position].date!,
+              noteList[position].date,
               style: const TextStyle(color: Colors.white),
             ),
             trailing: GestureDetector(
@@ -78,9 +81,11 @@ class _NoteListState extends State<NoteList> {
   void navigateToDetail(Note note, String title) async {
     bool result = await Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) {
-        return NoteDetails(note, title);
-      }),
+      MaterialPageRoute(
+        builder: (context) {
+          return NoteDetails(note, title);
+        },
+      ),
     );
     if (result == true) {
       updateListView();
@@ -93,7 +98,7 @@ class _NoteListState extends State<NoteList> {
       Future<List<Note>> noteListFuture = databaseHelper.getNoteList();
       noteListFuture.then((noteList) {
         setState(() {
-          noteList = noteList;
+          this.noteList = noteList;
           count = noteList.length;
         });
       });
