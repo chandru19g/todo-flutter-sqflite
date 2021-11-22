@@ -24,86 +24,6 @@ class _NoteDetailState extends State<NoteDetail> {
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
 
-  void updateTitle() {
-    note.title = titleController.text;
-  }
-
-  void updateDescription() {
-    note.description = descriptionController.text;
-  }
-
-  void _showAlertDialog(String title, String message) {
-    AlertDialog alertDialog = AlertDialog(
-      title: Text(title),
-      content: Text(message),
-    );
-
-    showDialog(context: context, builder: (_) => alertDialog);
-  }
-
-  // convert string to int to save to database
-  void updatePriorityAsInt(String value) {
-    switch (value) {
-      case 'High':
-        note.priority = 1;
-        break;
-      case 'Low':
-        note.priority = 2;
-        break;
-    }
-  }
-
-  // convert int to string to show user
-  String? getPriorityAsString(int value) {
-    String? priority;
-    switch (value) {
-      case 1:
-        priority = _priorities[0];
-        break;
-      case 2:
-        priority = _priorities[1];
-        break;
-    }
-    return priority;
-  }
-
-  moveToLastScreen() {
-    Navigator.pop(context);
-  }
-
-  void _save() async {
-    note.date = DateFormat.yMMMd().format(DateTime.now());
-    int result;
-    if (note.id != null) {
-      result = await helper.updateNote(note);
-    } else {
-      result = await helper.insertNote(note);
-    }
-
-    if (result != 0) {
-      _showAlertDialog('Status', 'Note saved successfully');
-    } else {
-      _showAlertDialog('Status', 'Problem saving Note');
-    }
-    moveToLastScreen();
-  }
-
-  void _delete() async {
-    if (note.id!.isNaN) {
-      _showAlertDialog('Status', 'First add a note');
-      return;
-    }
-
-    int result = await helper.deleteNote(note.id!);
-
-    if (result != 0) {
-      _showAlertDialog('Status', 'Note deleted successfully');
-    } else {
-      _showAlertDialog('Status', 'Problem deleting Note');
-    }
-    moveToLastScreen();
-  }
-
   @override
   Widget build(BuildContext context) {
     TextStyle? textStyle = Theme.of(context).textTheme.bodyText1;
@@ -248,5 +168,87 @@ class _NoteDetailState extends State<NoteDetail> {
         ),
       ),
     );
+  }
+
+  void updateTitle() {
+    note.title = titleController.text;
+  }
+
+  void updateDescription() {
+    note.description = descriptionController.text;
+  }
+
+  void _showAlertDialog(String title, String message) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+          );
+        });
+  }
+
+  // convert string to int to save to database
+  void updatePriorityAsInt(String value) {
+    switch (value) {
+      case 'High':
+        note.priority = 1;
+        break;
+      case 'Low':
+        note.priority = 2;
+        break;
+    }
+  }
+
+  // convert int to string to show user
+  String? getPriorityAsString(int value) {
+    String? priority;
+    switch (value) {
+      case 1:
+        priority = _priorities[0];
+        break;
+      case 2:
+        priority = _priorities[1];
+        break;
+    }
+    return priority;
+  }
+
+  moveToLastScreen() {
+    Navigator.pop(context, true);
+  }
+
+  void _save() async {
+    moveToLastScreen();
+    note.date = DateFormat.yMMMd().format(DateTime.now());
+    int result;
+    if (note.id != null) {
+      result = await helper.updateNote(note);
+    } else {
+      result = await helper.insertNote(note);
+    }
+    if (result != 0) {
+      _showAlertDialog('Status', 'Note saved successfully');
+    } else {
+      _showAlertDialog('Status', 'Problem saving Note');
+    }
+  }
+
+  void _delete() async {
+    moveToLastScreen();
+
+    if (note.id!.isNaN) {
+      _showAlertDialog('Status', 'First add a note');
+      return;
+    }
+
+    int result = await helper.deleteNote(note.id!);
+
+    if (result != 0) {
+      _showAlertDialog('Status', 'Note deleted successfully');
+    } else {
+      _showAlertDialog('Status', 'Problem deleting Note');
+    }
   }
 }
