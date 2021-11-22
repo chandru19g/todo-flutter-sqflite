@@ -6,11 +6,16 @@ import 'package:intl/intl.dart';
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
   final Note note;
+  final String buttonText;
+  final bool delButton;
 
-  const NoteDetail(this.appBarTitle, this.note, {Key? key}) : super(key: key);
+  const NoteDetail(this.appBarTitle, this.note, this.buttonText, this.delButton,
+      {Key? key})
+      : super(key: key);
 
   @override
-  _NoteDetailState createState() => _NoteDetailState(appBarTitle, note);
+  _NoteDetailState createState() =>
+      _NoteDetailState(appBarTitle, note, buttonText, delButton);
 }
 
 class _NoteDetailState extends State<NoteDetail> {
@@ -18,8 +23,11 @@ class _NoteDetailState extends State<NoteDetail> {
   DatabaseHelper helper = DatabaseHelper();
   String appBarTitle;
   Note note;
+  String buttonText;
+  bool delButton;
 
-  _NoteDetailState(this.appBarTitle, this.note);
+  _NoteDetailState(
+      this.appBarTitle, this.note, this.buttonText, this.delButton);
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -34,10 +42,10 @@ class _NoteDetailState extends State<NoteDetail> {
     return WillPopScope(
       onWillPop: () => moveToLastScreen(),
       child: Scaffold(
-        backgroundColor: Colors.cyanAccent,
+        backgroundColor: Colors.grey[300],
         appBar: AppBar(
           title: Text(appBarTitle),
-          backgroundColor: Colors.pink,
+          backgroundColor: Colors.deepPurple,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
             onPressed: () {
@@ -65,8 +73,8 @@ class _NoteDetailState extends State<NoteDetail> {
                             child: Text(dropDownStringItem,
                                 style: const TextStyle(
                                     fontSize: 20.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.red)),
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.lightGreen)),
                           );
                         }).toList(),
                         value: getPriorityAsString(note.priority),
@@ -79,8 +87,7 @@ class _NoteDetailState extends State<NoteDetail> {
                 ),
                 // Second Element
                 Padding(
-                  padding: const EdgeInsets.only(
-                      top: 15.0, bottom: 15.0, left: 15.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: TextField(
                     controller: titleController,
                     style: textStyle,
@@ -97,8 +104,7 @@ class _NoteDetailState extends State<NoteDetail> {
 
                 // Third Element
                 Padding(
-                  padding: const EdgeInsets.only(
-                      top: 15.0, bottom: 15.0, left: 15.0),
+                  padding: const EdgeInsets.all(15.0),
                   child: TextField(
                     controller: descriptionController,
                     style: textStyle,
@@ -123,42 +129,47 @@ class _NoteDetailState extends State<NoteDetail> {
                             padding: MaterialStateProperty.all(
                                 const EdgeInsets.all(8.0)),
                             backgroundColor:
-                                MaterialStateProperty.all(Colors.green),
+                                MaterialStateProperty.all(Colors.lightGreen),
                           ),
-                          child: const Text(
-                            'Save',
-                            textScaleFactor: 1.5,
+                          child: Text(
+                            buttonText,
+                            style: const TextStyle(letterSpacing: 1.0),
+                            textScaleFactor: 1.2,
                           ),
                           onPressed: () {
                             setState(() {
-                              debugPrint("Save button clicked");
                               _save();
                             });
                           },
                         ),
                       ),
-                      Container(
-                        width: 5.0,
-                      ),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(
-                                const EdgeInsets.all(8.0)),
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.red),
-                          ),
-                          child: const Text(
-                            'Delete',
-                            textScaleFactor: 1.5,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _delete();
-                            });
-                          },
-                        ),
-                      ),
+                      delButton
+                          ? Container(
+                              width: 10.0,
+                            )
+                          : Container(),
+                      delButton
+                          ? Expanded(
+                              child: ElevatedButton(
+                                style: ButtonStyle(
+                                  padding: MaterialStateProperty.all(
+                                      const EdgeInsets.all(8.0)),
+                                  backgroundColor:
+                                      MaterialStateProperty.all(Colors.pink),
+                                ),
+                                child: const Text(
+                                  'Delete',
+                                  style: TextStyle(letterSpacing: 1.0),
+                                  textScaleFactor: 1.2,
+                                ),
+                                onPressed: () {
+                                  setState(() {
+                                    _delete();
+                                  });
+                                },
+                              ),
+                            )
+                          : Container(),
                     ],
                   ),
                 ),

@@ -24,15 +24,26 @@ class _NoteListState extends State<NoteList> {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('LCO ToDo'),
-        backgroundColor: Colors.purple,
+        title: const Text('ToDo'),
+        backgroundColor: Colors.deepPurple,
       ),
-      body: getNoteListView(),
+      body: noteList.isNotEmpty
+          ? getNoteListView()
+          : Center(
+              child: Text(
+                "Add Todo's",
+                style: TextStyle(
+                  letterSpacing: 2.0,
+                  fontSize: 18.0,
+                  color: Colors.grey.shade700,
+                ),
+              ),
+            ),
       floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.purple,
+        backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.add),
         onPressed: () {
-          navigateToDetail(Note("", "", 2), "Add Note");
+          navigateToDetail(Note("", "", 2), "Add Note", "Save", false);
         },
       ),
     );
@@ -46,18 +57,20 @@ class _NoteListState extends State<NoteList> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
           ),
-          color: Colors.deepPurple,
+          color: Colors.deepPurple[400],
           elevation: 4.0,
           child: ListTile(
             leading: const CircleAvatar(
-              backgroundImage:
-                  NetworkImage('https://learncodeonline.in/mascot.png'),
-            ),
-            title: Text(noteList[position].title,
+                // backgroundColor: Colors.deepPurple,
+                backgroundImage: NetworkImage(
+              'https://i.ibb.co/m98Mfmm/Whats-App-Image-2021-11-22-at-1-48-05-PM-removebg-preview.png',
+            )),
+            title: Text(noteList[position].title.toUpperCase(),
                 style: const TextStyle(
+                  letterSpacing: 2.0,
                   color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 25.0,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 18.0,
                 )),
             subtitle: Text(
               noteList[position].date,
@@ -66,7 +79,8 @@ class _NoteListState extends State<NoteList> {
             trailing: GestureDetector(
               child: const Icon(Icons.open_in_new, color: Colors.white),
               onTap: () {
-                navigateToDetail(noteList[position], "Edit Todo");
+                navigateToDetail(
+                    noteList[position], "Edit Todo", "Update", true);
               },
             ),
           ),
@@ -75,10 +89,11 @@ class _NoteListState extends State<NoteList> {
     );
   }
 
-  void navigateToDetail(Note note, String title) async {
+  void navigateToDetail(
+      Note note, String title, String buttonText, bool delButton) async {
     bool result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetail(title, note);
+      return NoteDetail(title, note, buttonText, delButton);
     }));
 
     if (result == true) {
