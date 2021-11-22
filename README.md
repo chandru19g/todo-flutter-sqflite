@@ -4,7 +4,7 @@ New flutter Todo Application using sqflite for storing data and retrieving data 
 
 ## Demo
 
-![demo 1](./readmeassets/pic1.jpg)
-![demo 2](./readmeassets/pic2.jpg)
-![demo 3](./readmeassets/pic3.jpg)
-![demo 4](./readmeassets/pic4.jpg)
+![demo 1](readmeassets/pic1.jpg)
+![demo 2](readmeassets/pic2.jpg)
+![demo 3](readmeassets/pic3.jpg)
+![demo 4](readmeassets/pic4.jpg)
