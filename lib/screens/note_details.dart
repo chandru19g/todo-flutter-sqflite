@@ -63,7 +63,6 @@ class _NoteDetailState extends State<NoteDetail> {
               children: <Widget>[
                 Padding(
                   padding: const EdgeInsets.only(top: 15.0, bottom: 5.0),
-                  //dropdown menu
                   child: ListTile(
                     leading: const Icon(Icons.low_priority),
                     title: DropdownButton(
@@ -85,7 +84,6 @@ class _NoteDetailState extends State<NoteDetail> {
                         }),
                   ),
                 ),
-                // Second Element
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: TextField(
@@ -101,8 +99,6 @@ class _NoteDetailState extends State<NoteDetail> {
                     ),
                   ),
                 ),
-
-                // Third Element
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: TextField(
@@ -117,8 +113,6 @@ class _NoteDetailState extends State<NoteDetail> {
                     ),
                   ),
                 ),
-
-                // Fourth Element
                 Padding(
                   padding: const EdgeInsets.all(15.0),
                   child: Row(
@@ -200,7 +194,6 @@ class _NoteDetailState extends State<NoteDetail> {
         });
   }
 
-  // convert string to int to save to database
   void updatePriorityAsInt(String value) {
     switch (value) {
       case 'High':
@@ -212,7 +205,6 @@ class _NoteDetailState extends State<NoteDetail> {
     }
   }
 
-  // convert int to string to show user
   String? getPriorityAsString(int value) {
     String? priority;
     switch (value) {

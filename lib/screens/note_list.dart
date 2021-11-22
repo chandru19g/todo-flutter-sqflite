@@ -61,7 +61,6 @@ class _NoteListState extends State<NoteList> {
           elevation: 4.0,
           child: ListTile(
             leading: const CircleAvatar(
-                // backgroundColor: Colors.deepPurple,
                 backgroundImage: NetworkImage(
               'https://i.ibb.co/m98Mfmm/Whats-App-Image-2021-11-22-at-1-48-05-PM-removebg-preview.png',
             )),
