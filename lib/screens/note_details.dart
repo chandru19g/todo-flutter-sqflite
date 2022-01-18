@@ -6,16 +6,14 @@ import 'package:intl/intl.dart';
 class NoteDetail extends StatefulWidget {
   final String appBarTitle;
   final Note note;
-  final String buttonText;
-  final bool delButton;
 
-  const NoteDetail(this.appBarTitle, this.note, this.buttonText, this.delButton,
-      {Key? key})
-      : super(key: key);
+  const NoteDetail(this.appBarTitle, this.note, {Key? key}) : super(key: key);
 
   @override
-  _NoteDetailState createState() =>
-      _NoteDetailState(appBarTitle, note, buttonText, delButton);
+  _NoteDetailState createState() => _NoteDetailState(
+        appBarTitle,
+        note,
+      );
 }
 
 class _NoteDetailState extends State<NoteDetail> {
@@ -23,11 +21,11 @@ class _NoteDetailState extends State<NoteDetail> {
   DatabaseHelper helper = DatabaseHelper();
   String appBarTitle;
   Note note;
-  String buttonText;
-  bool delButton;
 
   _NoteDetailState(
-      this.appBarTitle, this.note, this.buttonText, this.delButton);
+    this.appBarTitle,
+    this.note,
+  );
 
   TextEditingController titleController = TextEditingController();
   TextEditingController descriptionController = TextEditingController();
@@ -45,6 +43,15 @@ class _NoteDetailState extends State<NoteDetail> {
         backgroundColor: Colors.grey[300],
         appBar: AppBar(
           title: Text(appBarTitle),
+          actions: [
+            IconButton(
+                icon: const Icon(Icons.check),
+                onPressed: () {
+                  setState(() {
+                    _save();
+                  });
+                }),
+          ],
           backgroundColor: Colors.deepPurple,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -111,60 +118,6 @@ class _NoteDetailState extends State<NoteDetail> {
                       labelText: 'Details',
                       icon: Icon(Icons.details),
                     ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(15.0),
-                  child: Row(
-                    children: <Widget>[
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            padding: MaterialStateProperty.all(
-                                const EdgeInsets.all(8.0)),
-                            backgroundColor:
-                                MaterialStateProperty.all(Colors.lightGreen),
-                          ),
-                          child: Text(
-                            buttonText,
-                            style: const TextStyle(letterSpacing: 1.0),
-                            textScaleFactor: 1.2,
-                          ),
-                          onPressed: () {
-                            setState(() {
-                              _save();
-                            });
-                          },
-                        ),
-                      ),
-                      delButton
-                          ? Container(
-                              width: 10.0,
-                            )
-                          : Container(),
-                      delButton
-                          ? Expanded(
-                              child: ElevatedButton(
-                                style: ButtonStyle(
-                                  padding: MaterialStateProperty.all(
-                                      const EdgeInsets.all(8.0)),
-                                  backgroundColor:
-                                      MaterialStateProperty.all(Colors.pink),
-                                ),
-                                child: const Text(
-                                  'Delete',
-                                  style: TextStyle(letterSpacing: 1.0),
-                                  textScaleFactor: 1.2,
-                                ),
-                                onPressed: () {
-                                  setState(() {
-                                    _delete();
-                                  });
-                                },
-                              ),
-                            )
-                          : Container(),
-                    ],
                   ),
                 ),
               ],
@@ -235,23 +188,6 @@ class _NoteDetailState extends State<NoteDetail> {
       _showAlertDialog('Status', 'Note saved successfully');
     } else {
       _showAlertDialog('Status', 'Problem saving Note');
-    }
-  }
-
-  void _delete() async {
-    moveToLastScreen();
-
-    if (note.id!.isNaN) {
-      _showAlertDialog('Status', 'First add a note');
-      return;
-    }
-
-    int result = await helper.deleteNote(note.id!);
-
-    if (result != 0) {
-      _showAlertDialog('Status', 'Note deleted successfully');
-    } else {
-      _showAlertDialog('Status', 'Problem deleting Note');
     }
   }
 }

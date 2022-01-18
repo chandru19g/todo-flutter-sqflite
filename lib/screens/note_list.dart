@@ -43,7 +43,7 @@ class _NoteListState extends State<NoteList> {
         backgroundColor: Colors.deepPurple,
         child: const Icon(Icons.add),
         onPressed: () {
-          navigateToDetail(Note("", "", 2), "Add Note", "Save", false);
+          navigateToDetail(Note("", "", 2), "Add Note");
         },
       ),
     );
@@ -53,34 +53,75 @@ class _NoteListState extends State<NoteList> {
     return ListView.builder(
       itemCount: count,
       itemBuilder: (context, position) {
-        return Card(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10.0),
-          ),
-          color: Colors.deepPurple[400],
-          elevation: 4.0,
-          child: ListTile(
-            leading: const CircleAvatar(
-                backgroundImage: NetworkImage(
-              'https://i.ibb.co/m98Mfmm/Whats-App-Image-2021-11-22-at-1-48-05-PM-removebg-preview.png',
-            )),
-            title: Text(noteList[position].title.toUpperCase(),
-                style: const TextStyle(
-                  letterSpacing: 2.0,
-                  color: Colors.white,
-                  fontWeight: FontWeight.w500,
-                  fontSize: 18.0,
-                )),
-            subtitle: Text(
-              noteList[position].date,
-              style: const TextStyle(color: Colors.white),
+        return Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Dismissible(
+            key: Key(noteList[position].id.toString()),
+            direction: DismissDirection.endToStart,
+            background: Container(
+              color: Colors.red,
+              alignment: Alignment.centerRight,
+              child: const Icon(
+                Icons.delete_forever,
+                color: Colors.white,
+                size: 50.0,
+              ),
             ),
-            trailing: GestureDetector(
-              child: const Icon(Icons.open_in_new, color: Colors.white),
+            onDismissed: (direction) {
+              _delete(noteList[position].id);
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('${noteList[position].title} dismissed'),
+                ),
+              );
+            },
+            child: InkWell(
               onTap: () {
-                navigateToDetail(
-                    noteList[position], "Edit Todo", "Update", true);
+                navigateToDetail(noteList[position], "Edit Todo");
               },
+              child: SizedBox(
+                height: 80.0,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          width: 5.0,
+                          color: Colors.deepPurple,
+                        ),
+                        const SizedBox(
+                          width: 20.0,
+                        ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              noteList[position].title.toUpperCase(),
+                              style: const TextStyle(
+                                letterSpacing: 2.0,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 18.0,
+                              ),
+                            ),
+                            const SizedBox(
+                              height: 4.0,
+                            ),
+                            Text(
+                              noteList[position].date,
+                              // style: const TextStyle(color: Colors.white),
+                            ),
+                            const SizedBox(
+                              height: 4.0,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
             ),
           ),
         );
@@ -88,11 +129,38 @@ class _NoteListState extends State<NoteList> {
     );
   }
 
-  void navigateToDetail(
-      Note note, String title, String buttonText, bool delButton) async {
+  void _delete(id) async {
+    if (id!.isNaN) {
+      _showAlertDialog('Status', 'First add a note');
+      return;
+    }
+
+    int result = await databaseHelper.deleteNote(id);
+
+    if (result != 0) {
+      updateListView();
+      _showAlertDialog('Status', 'Note deleted successfully');
+    } else {
+      updateListView();
+      _showAlertDialog('Status', 'Problem deleting Note');
+    }
+  }
+
+  void _showAlertDialog(String title, String message) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(message),
+          );
+        });
+  }
+
+  void navigateToDetail(Note note, String title) async {
     bool result =
         await Navigator.push(context, MaterialPageRoute(builder: (context) {
-      return NoteDetail(title, note, buttonText, delButton);
+      return NoteDetail(title, note);
     }));
 
     if (result == true) {
