@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:provider/provider.dart';
+import 'package:todoapp/ad_state.dart';
 import 'dart:async';
 import '../database_helper.dart';
 import '../note.dart';
@@ -17,6 +20,27 @@ class _NoteListState extends State<NoteList> {
   List<Note> noteList = [];
   int count = 0;
 
+  late BannerAd banner;
+  bool _isBannerAdReady = false;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final adState = Provider.of<AdState>(context);
+
+    adState.initialization.then((status) {
+      setState(() {
+        banner = BannerAd(
+          adUnitId: adState.bannerAdUnitId,
+          size: AdSize.banner,
+          listener: adState.adListner,
+          request: const AdRequest(),
+        )..load();
+        _isBannerAdReady = true;
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     if (noteList.isEmpty) {
@@ -28,7 +52,23 @@ class _NoteListState extends State<NoteList> {
         backgroundColor: Colors.deepPurple,
       ),
       body: noteList.isNotEmpty
-          ? getNoteListView()
+          ? Column(
+              children: [
+                Expanded(
+                  child: getNoteListView(),
+                ),
+                !_isBannerAdReady
+                    ? const SizedBox(
+                        height: 40.0,
+                      )
+                    : SizedBox(
+                        height: 40.0,
+                        child: AdWidget(
+                          ad: banner,
+                        ),
+                      ),
+              ],
+            )
           : Center(
               child: Text(
                 "Add Todo's",
@@ -39,12 +79,15 @@ class _NoteListState extends State<NoteList> {
                 ),
               ),
             ),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.deepPurple,
-        child: const Icon(Icons.add),
-        onPressed: () {
-          navigateToDetail(Note("", "", 2), "Add Note");
-        },
+      floatingActionButton: Align(
+        alignment: const Alignment(1.0, 0.8),
+        child: FloatingActionButton(
+          backgroundColor: Colors.deepPurple,
+          child: const Icon(Icons.add),
+          onPressed: () {
+            navigateToDetail(Note("", "", 2), "Add Note");
+          },
+        ),
       ),
     );
   }

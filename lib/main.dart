@@ -1,33 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
+import 'package:todoapp/ad_state.dart';
 import 'screens/note_list.dart';
+import 'package:provider/provider.dart';
 
-AppOpenAd? openAd;
-
-Future<void> loadAd() async {
-  await AppOpenAd.load(
-    adUnitId: 'ca-app-pub-3940256099942544/3419835294',
-    request: const AdRequest(),
-    adLoadCallback: AppOpenAdLoadCallback(
-      onAdLoaded: (ad) {
-        print('Ad Loaded');
-        openAd = ad;
-        openAd!.show();
-      },
-      onAdFailedToLoad: (error) {
-        print('Ad Failed to Load $error');
-      },
-    ),
-    orientation: AppOpenAd.orientationPortrait,
-  );
-}
-
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await MobileAds.instance.initialize();
-
-  await loadAd();
-  runApp(const MyApp());
+  final initFuture = MobileAds.instance.initialize();
+  final adState = AdState(initFuture);
+  runApp(Provider.value(
+    value: adState,
+    builder: (context, child) => const MyApp(),
+  ));
 }
 
 class MyApp extends StatelessWidget {
